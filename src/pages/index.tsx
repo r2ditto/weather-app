@@ -47,15 +47,27 @@ export default function Home() {
 
   return (
     <>
+      <div className="px-10">
+        <h1 className="text-9xl font-bold text-zinc-400">
+          Todays <br />
+          Weather
+        </h1>
+        <p className="ml-5 text-lg mt-2 text-zinc-700">
+          search for a city and get the current weather report before you step
+          out.
+        </p>
+      </div>
+
       {/* Search Bar */}
-      <div className="relative text-gray-600 m-5 ">
+      <div className="relative text-gray-600 m-20 max-w-md mx-auto">
         <input
           type="search"
           name="search"
           placeholder="Search"
           value={cityName || "Loading location..."}
-          className="bg-white h-10 px-5 pr-10 rounded-full text-sm focus:outline-none w-full"
+          className="bg-white py-3 px-5 pr-10 rounded-full text-xl focus:outline-none w-full"
         />
+
         <button type="submit" className="absolute right-0 top-0 mt-2 mr-3">
           <svg
             className="h-4 w-4 fill-current"
