@@ -4,6 +4,7 @@ export default function Home() {
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(
     null
   );
+  const [cityName, setCityName] = useState<string>("");
 
   useEffect(() => {
     if ("geolocation" in navigator) {
@@ -24,6 +25,26 @@ export default function Home() {
     }
   }, []);
 
+  useEffect(() => {
+    const fetchCityName = async () => {
+      if (!location) return;
+
+      try {
+        const response = await fetch(
+          `http://api.openweathermap.org/geo/1.0/reverse?lat=${location.lat}&lon=${location.lng}&limit=1&appid=${process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY}`
+        );
+        const data = await response.json();
+        if (data && data[0]) {
+          setCityName(data[0].name);
+        }
+      } catch (error) {
+        console.error("Error fetching city:", error);
+      }
+    };
+
+    fetchCityName();
+  }, [location]);
+
   return (
     <>
       {/* Search Bar */}
@@ -32,7 +53,7 @@ export default function Home() {
           type="search"
           name="search"
           placeholder="Search"
-          value={location?.lat.toFixed(4) + ", " + location?.lng.toFixed(4)}
+          value={cityName || "Loading location..."}
           className="bg-white h-10 px-5 pr-10 rounded-full text-sm focus:outline-none w-full"
         />
         <button type="submit" className="absolute right-0 top-0 mt-2 mr-3">
