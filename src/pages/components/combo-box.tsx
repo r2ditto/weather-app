@@ -25,7 +25,7 @@ interface RenderOptionProps<T> {
   option: T;
 }
 
-export function Combobox<T>({ children, ...props }: ComboboxProps<T>) {
+export default function Combobox<T>({ children, ...props }: ComboboxProps<T>) {
   return (
     <ComboboxContext.Provider value={props}>
       <div className="flex flex-col items-center justify-center relative">

@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-import { InfoMessage } from "./info-message";
+import InfoMessage from "./info-message";
 
 import { WeatherData, Location } from "@/types";
 import { getCurrentDate, getWeatherImage } from "@/utils";
@@ -12,7 +12,7 @@ interface WeatherInfoProps {
   error?: string;
 }
 
-export function WeatherInfo({
+export default function WeatherInfo({
   weather,
   isLoading,
   location,

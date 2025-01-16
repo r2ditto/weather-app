@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from "react";
 
-import { Combobox } from "./components/combo-box";
-import { WeatherInfo } from "./components/weather-information";
+import Combobox from "./components/combo-box";
+import WeatherInfo from "./components/weather-information";
 
 import { useDebounce } from "../hooks/useDebounce";
 import { useLocationWeather } from "../hooks/useLocationWeather";
