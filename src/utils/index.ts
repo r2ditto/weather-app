@@ -31,3 +31,15 @@ export const getWeatherImage = (weatherCondition: string | undefined) => {
       return "/clouds.png";
   }
 };
+
+export const getCurrentPosition = async (): Promise<GeolocationPosition> => {
+  if (!("geolocation" in navigator)) {
+    throw new Error(
+      "Geolocation is not supported by your browser. Please search for a city manually."
+    );
+  }
+
+  return new Promise((resolve, reject) => {
+    navigator.geolocation.getCurrentPosition(resolve, reject);
+  });
+};

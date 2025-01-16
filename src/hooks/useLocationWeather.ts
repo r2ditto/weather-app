@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import { weatherService } from "@/services/weatherService";
 import { WeatherData, Location } from "@/types";
 
+import { getCurrentPosition } from "@/utils";
+
 export function useLocationWeather() {
   const [confirmedLocation, setConfirmedLocation] = useState<Location | null>(
     null
@@ -11,70 +13,54 @@ export function useLocationWeather() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | undefined>(undefined);
 
-  // Geolocation effect
-  useEffect(() => {
-    if ("geolocation" in navigator) {
-      setIsLoading(true);
-      setError(undefined);
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const coords = {
-            lat: position.coords.latitude,
-            lon: position.coords.longitude,
-          };
-
-          try {
-            const data = await weatherService.fetchCityByCoords(
-              coords.lat,
-              coords.lon
-            );
-            if (data && data[0]) {
-              setConfirmedLocation({ ...coords, name: data[0].name });
-            }
-          } catch (error) {
-            console.error("Error fetching city:", error);
-          } finally {
-            setIsLoading(false);
-          }
-        },
-        (error) => {
-          console.error("Error getting location:", error);
-          setError(
-            "Unable to access your location. Please search for a city manually."
-          );
-          setIsLoading(false);
-        }
-      );
-    } else {
-      setError(
-        "Geolocation is not supported by your browser. Please search for a city manually."
-      );
+  const fetchCityData = async (lat: number, lon: number) => {
+    const cityData = await weatherService.fetchCityByCoords(lat, lon);
+    if (!cityData?.[0]) {
+      throw new Error("Could not determine city from coordinates");
     }
-  }, []);
+    return cityData[0].name;
+  };
 
-  // Weather fetch effect
   useEffect(() => {
-    const fetchWeather = async () => {
-      if (!confirmedLocation) return;
-
+    async function initializeLocationWeather() {
       setIsLoading(true);
       setError(undefined);
+
       try {
-        const data = await weatherService.fetchWeatherByCoords(
-          confirmedLocation.lat,
-          confirmedLocation.lon
+        // Get user's position
+        const position = await getCurrentPosition();
+        const coords = {
+          lat: position.coords.latitude,
+          lon: position.coords.longitude,
+        };
+
+        // Get city name
+        const cityName = await fetchCityData(coords.lat, coords.lon);
+
+        // Set location first
+        const location = { ...coords, name: cityName };
+        setConfirmedLocation(location);
+
+        // Then fetch weather data
+        const weatherData = await weatherService.fetchWeatherByCoords(
+          coords.lat,
+          coords.lon
         );
-        setWeather(data);
+        setWeather(weatherData);
       } catch (error) {
-        console.error("Error fetching weather:", error);
-        setError("Unable to fetch weather data. Please try again later.");
+        console.error("Error:", error);
+        setError(
+          error instanceof GeolocationPositionError
+            ? "Unable to access your location. Please search for a city manually."
+            : (error as Error).message || "An unexpected error occurred"
+        );
       } finally {
         setIsLoading(false);
       }
-    };
+    }
 
-    fetchWeather();
-  }, [confirmedLocation]);
+    initializeLocationWeather();
+  }, []);
 
   return {
     confirmedLocation,
