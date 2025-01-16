@@ -1,5 +1,4 @@
 import React, { createContext, useContext, ReactNode } from "react";
-
 interface ComboboxContextType<T> {
   searchInput: string;
   suggestions: T[];
@@ -53,15 +52,20 @@ Combobox.Icon = function ComboboxIcon() {
 
 Combobox.Input = function ComboboxInput() {
   const context = useContext(ComboboxContext);
+
   if (!context) throw new Error("ComboboxInput must be used within Combobox");
 
   return (
     <input
       name="search"
-      placeholder={context.placeholder}
+      role="combobox"
+      aria-expanded={context.suggestions.length > 0}
+      aria-controls="search-suggestions"
+      aria-autocomplete="list"
+      placeholder={context.placeholder || "Enter a city"}
       value={context.searchInput}
       onChange={context.onInputChange}
-      className="ml-3 bg-transparent border-none text-white focus:outline-none text-2xl placeholder-white"
+      className="ml-3 border-none text-zinc focus:outline-none text-xl placeholder-zinc rounded-full py-2 px-5 w-full"
     />
   );
 };
@@ -78,16 +82,22 @@ Combobox.Suggestions = function ComboboxSuggestions<T>({
   if (!context.suggestions.length) return null;
 
   return (
-    <div className="absolute w-full bg-white mt-12 rounded-lg shadow-lg z-10 top-0">
+    <ul
+      id="search-suggestions"
+      role="listbox"
+      className="absolute w-full bg-white mt-12 rounded-lg shadow-lg z-10 top-0"
+    >
       {context.suggestions.map((suggestion, index) => (
-        <div
+        <li
           key={index}
+          role="option"
+          aria-selected={false}
           className="px-4 py-2 hover:bg-gray-100 cursor-pointer rounded-lg"
           onClick={() => context.onSelectSuggestion(suggestion)}
         >
           {renderOption({ option: suggestion })}
-        </div>
+        </li>
       ))}
-    </div>
+    </ul>
   );
 };
