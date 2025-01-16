@@ -5,6 +5,9 @@ import InfoMessage from "./info-message";
 import { WeatherData, Location } from "@/types";
 import { getCurrentDate, getWeatherImage } from "@/utils";
 
+import { WiHot } from "react-icons/wi";
+import { FaTemperatureHigh, FaWind } from "react-icons/fa";
+
 interface WeatherInfoProps {
   weather: WeatherData | null;
   isLoading: boolean;
@@ -39,6 +42,26 @@ export default function WeatherInfo({
   }
 
   const weatherImage = getWeatherImage(weather?.weather[0]?.main);
+  const weatherStats = [
+    {
+      Icon: WiHot,
+      value: `${weather.main.humidity}%`,
+      label: "Humidity",
+      iconClass: "text-4xl",
+    },
+    {
+      Icon: FaTemperatureHigh,
+      value: `${Math.round(weather.main.feels_like)}°C`,
+      label: "Feels like",
+      iconClass: "text-2xl",
+    },
+    {
+      Icon: FaWind,
+      value: `${Math.round(weather.wind.speed)}km/h`,
+      label: "Wind",
+      iconClass: "text-2xl",
+    },
+  ];
 
   return (
     <div className="flex items-center justify-center flex-col">
@@ -60,24 +83,15 @@ export default function WeatherInfo({
       </div>
 
       <div className="text-center rounded-lg bg-white p-10 mt-10 w-full flex justify-between">
-        <div className="flex flex-col">
-          <p className="text-zinc text-lg font-bold">
-            {`${weather.main.humidity}%`}
-          </p>
-          <p className="text-zinc text-xs">Humidity</p>
-        </div>
-        <div className="flex flex-col">
-          <p className="text-zinc text-lg font-bold">
-            {`${Math.round(weather.main.feels_like)}°C`}
-          </p>
-          <p className="text-zinc text-xs">Feels like</p>
-        </div>
-        <div className="flex flex-col">
-          <p className="text-zinc text-lg font-bold">
-            {`${Math.round(weather.wind.speed)}km/h`}
-          </p>
-          <p className="text-zinc text-xs">Wind</p>
-        </div>
+        {weatherStats.map(({ Icon, value, label, iconClass }) => (
+          <div key={label} className="flex flex-col items-center">
+            <div className="h-8 flex items-center">
+              <Icon className={`text-zinc ${iconClass}`} />
+            </div>
+            <p className="text-zinc text-lg font-bold">{value}</p>
+            <p className="text-zinc text-xs">{label}</p>
+          </div>
+        ))}
       </div>
     </div>
   );
